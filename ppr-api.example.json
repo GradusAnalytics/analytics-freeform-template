@@ -1,0 +1,133 @@
+{
+  "versao_manifest": 1,
+  "ferramenta": {
+    "codigo": "minha_ferramenta",
+    "nome": "Minha Ferramenta",
+    "repositorio": "GradusAnalytics/<nome-do-repo>",
+    "descricao": "Descrição curta do que a ferramenta faz"
+  },
+  "servico": {
+    "porta": null,
+    "url_base": "https://<api-id>.execute-api.us-east-1.amazonaws.com",
+    "prefixo_upstream": "/",
+    "rota_ppr": null,
+    "saude": { "caminho": "/health", "status_esperado": 200 }
+  },
+  "identidade": {
+    "cabecalho_email": "X-PPR-Email",
+    "cabecalho_nome": "X-PPR-Nome",
+    "cabecalhos_segredos": ["X-Api-Token"]
+  },
+  "operacoes": [
+    {
+      "codigo": "listar_itens",
+      "nome": "Listar itens",
+      "descricao": "Lista os itens de uma pasta",
+      "efeito": "leitura",
+      "metodo": "GET",
+      "caminho": "/itens",
+      "corpo": null,
+      "timeout_s": 30,
+      "entradas": [
+        {
+          "codigo": "pasta",
+          "nome": "Pasta",
+          "tipo": "texto_curto",
+          "onde": "query",
+          "obrigatorio": false,
+          "padrao": "",
+          "opcoes": [],
+          "descricao": "Vazio = raiz"
+        }
+      ],
+      "saidas": [
+        {
+          "codigo": "itens",
+          "nome": "Itens",
+          "tipo": "tabela",
+          "origem": "/itens",
+          "descricao": "Um item por linha"
+        },
+        {
+          "codigo": "total",
+          "nome": "Total",
+          "tipo": "numero",
+          "origem": "/total",
+          "descricao": "Quantidade de itens"
+        }
+      ]
+    },
+    {
+      "codigo": "atualizar_item",
+      "nome": "Atualizar item",
+      "descricao": "Altera o status de um item",
+      "efeito": "escrita",
+      "metodo": "PATCH",
+      "caminho": "/itens/{id}",
+      "corpo": "json",
+      "timeout_s": 30,
+      "entradas": [
+        {
+          "codigo": "id",
+          "nome": "Item",
+          "tipo": "texto_curto",
+          "onde": "caminho",
+          "obrigatorio": true,
+          "padrao": null,
+          "opcoes": [],
+          "descricao": "Identificador do item"
+        },
+        {
+          "codigo": "status",
+          "nome": "Status",
+          "tipo": "picklist",
+          "onde": "corpo",
+          "obrigatorio": true,
+          "padrao": "aberto",
+          "opcoes": ["aberto", "fechado"],
+          "descricao": "Novo status"
+        }
+      ],
+      "saidas": [
+        {
+          "codigo": "item",
+          "nome": "Item atualizado",
+          "tipo": "json",
+          "origem": "",
+          "descricao": "Resposta completa do app"
+        }
+      ]
+    },
+    {
+      "codigo": "gerar_relatorio",
+      "nome": "Gerar relatório",
+      "descricao": "Recebe uma planilha e devolve o relatório em Excel",
+      "efeito": "leitura",
+      "metodo": "POST",
+      "caminho": "/relatorio",
+      "corpo": "multipart",
+      "timeout_s": 120,
+      "entradas": [
+        {
+          "codigo": "planilha",
+          "nome": "Planilha",
+          "tipo": "arquivo",
+          "onde": "arquivo",
+          "obrigatorio": true,
+          "padrao": null,
+          "opcoes": [],
+          "descricao": "Arquivo .xlsx de entrada"
+        }
+      ],
+      "saidas": [
+        {
+          "codigo": "relatorio",
+          "nome": "Relatório",
+          "tipo": "arquivo",
+          "origem": "@corpo",
+          "descricao": "Arquivo .xlsx devolvido pelo app"
+        }
+      ]
+    }
+  ]
+}

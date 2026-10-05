@@ -74,6 +74,22 @@ Para ambiente de desenvolvimento, crie uma segunda ferramenta no PPR apontando p
 
 ---
 
+## API para o barramento do PPR (`ppr-api.json`)
+
+Se a ferramenta chama um backend (API Gateway, Lambda, app numa máquina do PPR), coloque na raiz do
+repositório um `ppr-api.json` declarando as operações que o PPR pode chamar por API, com entradas e
+saídas. O barramento do PPR lê esse arquivo e passa a atender `POST /api/v1/ferramentas/<codigo>/<operacao>/`
+com o token do usuário. Só o que estiver declarado fica exposto.
+
+- Ponto de partida: copie `ppr-api.example.json` para `ppr-api.json` e ajuste.
+- Especificação completa: `docs/barramento_manifest.md` no repositório `GradusAnalytics/PlataformaPrototipagem`.
+- Marque com `"efeito": "escrita"` toda operação que altera dados.
+- Nada de segredos no manifesto nem no HTML (o repositório é público): informe só o **nome** do cabeçalho
+  em `identidade.cabecalhos_segredos`; o valor fica numa variável de ambiente do PPR.
+- Mudou uma rota do backend, mude o manifesto no mesmo commit. Ferramenta sem backend não precisa do arquivo.
+
+---
+
 ## Fluxo de desenvolvimento
 
 ```
@@ -99,6 +115,7 @@ git push origin main
 │   └── workflows/
 │       └── deploy-pages.yml   ← workflow de CI/CD (não editar)
 ├── sua-ferramenta.html        ← HTML da ferramenta
+├── ppr-api.json               ← operações expostas ao barramento do PPR (se houver backend)
 └── README.md
 ```
 
